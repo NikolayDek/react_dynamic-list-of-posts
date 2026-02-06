@@ -17,16 +17,22 @@ export const NewCommentForm: React.FC<Props> = ({ onSubmit }) => {
     body: false,
   });
 
+  const trimmedData = {
+    name: name.trim(),
+    email: email.trim(),
+    body: body.trim(),
+  };
+
   const handleErrors = () => {
-    if (!name) {
+    if (!trimmedData.name) {
       setErrors(prev => ({ ...prev, name: true }));
     }
 
-    if (!email) {
+    if (!trimmedData.email) {
       setErrors(prev => ({ ...prev, email: true }));
     }
 
-    if (!body) {
+    if (!trimmedData.body) {
       setErrors(prev => ({ ...prev, body: true }));
     }
   };
@@ -42,7 +48,7 @@ export const NewCommentForm: React.FC<Props> = ({ onSubmit }) => {
     });
   };
 
-  const handleSumbit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     setErrors({
@@ -51,7 +57,7 @@ export const NewCommentForm: React.FC<Props> = ({ onSubmit }) => {
       body: false,
     });
 
-    if (!name || !email || !body) {
+    if (!trimmedData.name || !trimmedData.email || !trimmedData.body) {
       handleErrors();
 
       return;
@@ -59,9 +65,9 @@ export const NewCommentForm: React.FC<Props> = ({ onSubmit }) => {
 
     setSubmitting(true);
 
-    await onSubmit({ name, email, body });
+    await onSubmit(trimmedData);
 
-    clearForm();
+    setBody('');
     setSubmitting(false);
   };
 
@@ -83,7 +89,7 @@ export const NewCommentForm: React.FC<Props> = ({ onSubmit }) => {
   };
 
   return (
-    <form data-cy="NewCommentForm" onSubmit={handleSumbit}>
+    <form data-cy="NewCommentForm" onSubmit={handleSubmit}>
       <div className="field" data-cy="NameField">
         <label className="label" htmlFor="comment-author-name">
           Author Name
