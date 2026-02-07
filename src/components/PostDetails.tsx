@@ -16,20 +16,35 @@ type Props = {
 export const PostDetails: React.FC<Props> = ({ post }) => {
   const [comments, setComments] = useState<PostComment[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<boolean>(false);
   const [isFormVisible, setIsFormVisible] = useState<boolean>(false);
+  const [error, setError] = useState({
+    load: false,
+    add: false,
+    delete: false,
+  });
 
   const loadComments = useCallback(() => {
     setIsLoading(true);
-    setError(false);
+    setError(prev => ({ ...prev, load: false }));
+    setIsFormVisible(false);
 
     getPostComments(post.id)
       .then(setComments)
-      .catch(() => setError(true))
+      .catch(() => setError(prev => ({ ...prev, load: true })))
       .finally(() => setIsLoading(false));
-  }, [post]);
+  }, [post.id]);
+
+  const resetErrors = () => {
+    setError({
+      load: false,
+      add: false,
+      delete: false,
+    });
+  };
 
   const addComment = async ({ name, email, body }: CommentData) => {
+    resetErrors();
+
     try {
       const createdComment = await addPostComment({
         name,
@@ -39,21 +54,22 @@ export const PostDetails: React.FC<Props> = ({ post }) => {
       });
 
       setComments(prevComments => [...prevComments, createdComment]);
-    } catch (e) {
-      setError(true);
-    };
+    } catch {
+      setError(prev => ({ ...prev, add: true }));
+    }
   };
 
   const deleteComment = async (commentId: number) => {
-    setComments(prevComments =>
-      prevComments.filter(comm => comm.id !== commentId),
-    );
+    const prevComments = [...comments];
+
+    resetErrors();
+    setComments(prev => prev.filter(c => c.id !== commentId));
 
     try {
       await deletePostComment(commentId);
-    }
-    catch {
-      setError(true);
+    } catch {
+      setError(prev => ({ ...prev, delete: true }));
+      setComments(prevComments);
     }
   };
 
@@ -72,19 +88,19 @@ export const PostDetails: React.FC<Props> = ({ post }) => {
       <div className="block">
         {isLoading && <Loader />}
 
-        {!isLoading && error && (
+        {!isLoading && (error.load || error.delete || error.add) && (
           <div className="notification is-danger" data-cy="CommentsError">
             Something went wrong
           </div>
         )}
 
-        {!isLoading && !error && comments.length === 0 && (
+        {!isLoading && !error.load && comments.length === 0 && (
           <p className="title is-4" data-cy="NoCommentsMessage">
             No comments yet
           </p>
         )}
 
-        {comments.length > 0 && !isLoading && !error && (
+        {comments.length > 0 && !isLoading && !error.load && (
           <>
             <p className="title is-4">Comments:</p>
             {comments.map(comment => (
@@ -94,7 +110,7 @@ export const PostDetails: React.FC<Props> = ({ post }) => {
                 data-cy="Comment"
               >
                 <div className="message-header">
-                  <a href={comment.email} data-cy="CommentAuthor">
+                  <a href={`mailto:${comment.email}`} data-cy="CommentAuthor">
                     {comment.name}
                   </a>
                   <button
@@ -116,7 +132,7 @@ export const PostDetails: React.FC<Props> = ({ post }) => {
           </>
         )}
 
-        {!isLoading && !error && !isFormVisible && (
+        {!isLoading && !error.load && !isFormVisible && (
           <button
             data-cy="WriteCommentButton"
             type="button"
@@ -128,7 +144,9 @@ export const PostDetails: React.FC<Props> = ({ post }) => {
         )}
       </div>
 
-      {isFormVisible && <NewCommentForm onSubmit={addComment} />}
+      {!isLoading && !error.load && isFormVisible && (
+        <NewCommentForm onSubmit={addComment} />
+      )}
     </div>
   );
 };

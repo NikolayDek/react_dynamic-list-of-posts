@@ -72,7 +72,12 @@ export const UserSelector: React.FC<Props> = ({
               className={classNames('dropdown-item', {
                 'is-active': currentUser?.id === user.id,
               })}
-              onClick={() => onSelectUser(user)}
+              onClick={e => {
+                e.preventDefault();
+                e.stopPropagation();
+                onSelectUser(user);
+                setSelectIsOpen(false);
+              }}
             >
               {user.name}
             </a>

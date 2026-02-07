@@ -8,7 +8,7 @@ import { PostsList } from './components/PostsList';
 import { PostDetails } from './components/PostDetails';
 import { UserSelector } from './components/UserSelector';
 import { Loader } from './components/Loader';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Post } from './types/Post';
 import { User } from './types/User';
 import { getPosts } from './utils/postsApi';
@@ -20,8 +20,55 @@ export const App = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
 
-  const loadPosts = useCallback(() => {
-    if (!currentUser) {
+  // const loadPosts = useCallback(() => {
+  //   if (!currentUser) {
+  //     return;
+  //   }
+
+  //   setIsLoading(true);
+  //   setError(false);
+
+  //   getPosts(currentUser.id)
+  //     .then(setPosts)
+  //     .catch(() => setError(true))
+  //     .finally(() => setIsLoading(false));
+  // }, [currentUser]);
+
+  // useEffect(() => {
+  //   setCurrentPost(null);
+
+  //   if (currentUser) {
+  //     loadPosts();
+  //   } else {
+  //     setPosts([]);
+  //   }
+  // }, [currentUser]);
+
+  // useEffect(() => {
+  //   setCurrentPost(null);
+
+  //   if (!currentUser) {
+  //     setPosts([]);
+  //     return;
+  //   }
+
+  //   setIsLoading(true);
+  //   setError(false);
+
+  //   getPosts(currentUser.id)
+  //     .then(setPosts)
+  //     .catch(() => setError(true))
+  //     .finally(() => setIsLoading(false));
+  // }, [currentUser]);
+
+  useEffect(() => {
+    setCurrentPost(null);
+
+    if (!currentUser?.id) {
+      setPosts([]);
+      setError(false);
+      setIsLoading(false);
+
       return;
     }
 
@@ -29,14 +76,10 @@ export const App = () => {
     setError(false);
 
     getPosts(currentUser.id)
-      .then(setPosts)
+      .then(data => setPosts(data))
       .catch(() => setError(true))
       .finally(() => setIsLoading(false));
   }, [currentUser]);
-
-  useEffect(() => {
-    loadPosts();
-  }, [loadPosts]);
 
   return (
     <main className="section">
@@ -91,7 +134,7 @@ export const App = () => {
               'is-parent',
               'is-8-desktop',
               'Sidebar',
-              'Sidebar--open',
+              { 'Sidebar--open': currentPost },
             )}
           >
             <div className="tile is-child box is-success">
