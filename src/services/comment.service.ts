@@ -1,5 +1,5 @@
 import { PostComment } from '../types/Comment';
-import { client } from './fetchClient';
+import { client } from '../utils/fetchClient';
 
 export const getPostComments = (postId: number) => {
   return client.get<PostComment[]>(`/comments?postId=${postId}`);

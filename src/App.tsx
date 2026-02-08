@@ -11,7 +11,7 @@ import { Loader } from './components/Loader';
 import { useEffect, useState } from 'react';
 import { Post } from './types/Post';
 import { User } from './types/User';
-import { getPosts } from './utils/postsApi';
+import { getPosts } from './services/post.service';
 
 export const App = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -19,47 +19,6 @@ export const App = () => {
   const [currentPost, setCurrentPost] = useState<Post | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<boolean>(false);
-
-  // const loadPosts = useCallback(() => {
-  //   if (!currentUser) {
-  //     return;
-  //   }
-
-  //   setIsLoading(true);
-  //   setError(false);
-
-  //   getPosts(currentUser.id)
-  //     .then(setPosts)
-  //     .catch(() => setError(true))
-  //     .finally(() => setIsLoading(false));
-  // }, [currentUser]);
-
-  // useEffect(() => {
-  //   setCurrentPost(null);
-
-  //   if (currentUser) {
-  //     loadPosts();
-  //   } else {
-  //     setPosts([]);
-  //   }
-  // }, [currentUser]);
-
-  // useEffect(() => {
-  //   setCurrentPost(null);
-
-  //   if (!currentUser) {
-  //     setPosts([]);
-  //     return;
-  //   }
-
-  //   setIsLoading(true);
-  //   setError(false);
-
-  //   getPosts(currentUser.id)
-  //     .then(setPosts)
-  //     .catch(() => setError(true))
-  //     .finally(() => setIsLoading(false));
-  // }, [currentUser]);
 
   useEffect(() => {
     setCurrentPost(null);

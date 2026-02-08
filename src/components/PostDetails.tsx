@@ -2,12 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Loader } from './Loader';
 import { NewCommentForm } from './NewCommentForm';
 import { Post } from '../types/Post';
-import {
-  addPostComment,
-  deletePostComment,
-  getPostComments,
-} from '../utils/commentsApi';
 import { CommentData, PostComment } from '../types/Comment';
+import { addPostComment, deletePostComment, getPostComments } from '../services/comment.service';
 
 type Props = {
   post: Post;
@@ -74,6 +70,11 @@ export const PostDetails: React.FC<Props> = ({ post }) => {
   };
 
   useEffect(() => {
+    if (!post?.id) {
+
+      return;
+    }
+
     loadComments();
   }, [loadComments]);
 

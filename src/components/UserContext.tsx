@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { User } from '../types/User';
-import { getUsers } from '../utils/usersApi';
+import { getUsers } from '../services/users.service';
 
 export const UserContext = React.createContext<User[]>([]);
 
